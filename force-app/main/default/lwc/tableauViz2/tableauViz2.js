@@ -91,7 +91,9 @@ export default class TableauViz2 extends LightningElement {
           }
           html.push("]}");
         }
-      
+        html.push("\n")
+        html.push("\n")
+        html.push('Do you want create a new record from the JSON attributes.')
         alert(html)
     }
     // function call -end

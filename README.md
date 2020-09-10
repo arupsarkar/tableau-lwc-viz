@@ -62,7 +62,7 @@ After you install the package, you can [Add the Tableau Visualization component 
 1. Clone the **tableau-viz-lwc** repository:
 
     ```
-    git clone https://github.com/tableau/tableau-viz-lwc
+    git clone https://github.com/arupsarkar/tableau-lwc-viz.git
 
     ```
 
@@ -113,7 +113,7 @@ This includes non source-tracked orgs such as a [free Developer Edition Org](htt
 1. Clone this repository:
 
     ```
-    git clone https://github.com/tableau/tableau-viz-lwc
+    git clone https://github.com/arupsarkar/tableau-lwc-viz.git
 
     ```
 
