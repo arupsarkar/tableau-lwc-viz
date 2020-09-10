@@ -1,0 +1,15 @@
+<template>
+    <article class="slds-card">
+        <div class="tabVizPlaceholder2" lwc:dom="manual">
+        </div>
+        <lightning-button variant="brand" 
+            label="Get Data (Not Working)" 
+            title="Primary action" 
+            onclick={getUnderlyingData} 
+            class="slds-m-left_x-small">
+        </lightning-button> 
+    </article>
+    <div>
+        {tableData}
+    </div>
+</template>
