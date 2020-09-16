@@ -2,6 +2,11 @@ import { LightningElement, track } from 'lwc';
 import { loadScript } from 'lightning/platformResourceLoader';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import tableauJSAPI from '@salesforce/resourceUrl/tableauJSAPI';
+import { createRecord } from 'lightning/uiRecordApi';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+
+import TABLEAU_LOG_OBJECT from '@salesforce/schema/Tableau_Log__c';
+import DATA_VALUE_FIELD from '@salesforce/schema/Tableau_Log__c.Data_Value__c';
 
 import templateMain from './tableauViz2.html';
 
@@ -16,9 +21,35 @@ export default class TableauViz2 extends LightningElement {
     @track tableData = '';
     @track dataTableName = ''
     @track filterData = ''
+    objectId;
     // function calls - start
     clearData() {
         this.tableData = ''
+    }
+    createTableauLogRecord() {
+        const fields = {};
+        fields[DATA_VALUE_FIELD.fieldApiName] = JSON.stringify(this.tableData)
+        const recordInput = { apiName: TABLEAU_LOG_OBJECT.objectApiName, fields };
+        createRecord(recordInput)
+            .then(object => {
+                this.objectId = object.id;
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Success',
+                        message: 'Tableau Log record created, Id - ' + this.objectId,
+                        variant: 'success',
+                    }),
+                );
+            })
+            .catch(error => {
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error creating record',
+                        message: error.body.message,
+                        variant: 'error',
+                    }),
+                );
+            });
     }
     getUnderlyingData() {
         console.log('getUnderlyingData : ', ' - start ')

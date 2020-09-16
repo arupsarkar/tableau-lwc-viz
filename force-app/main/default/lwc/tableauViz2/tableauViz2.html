@@ -14,7 +14,7 @@
         <div class="slds-grid slds-gutters">
             <div class="slds-col">
                 <lightning-card  title="Selected Data">
-                    <lightning-button variant="brand" label="Create Record" slot="actions"></lightning-button>
+                    <lightning-button variant="brand" label="Create Record" slot="actions" onclick={createTableauLogRecord}></lightning-button>
                     <lightning-button label="Clear Data" slot="actions" onclick={clearData}></lightning-button>
                     <p class="slds-p-horizontal_small">{tableData}</p>
                     <p slot="footer">{dataTableName}</p>
