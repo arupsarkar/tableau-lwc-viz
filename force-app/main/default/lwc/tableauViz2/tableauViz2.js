@@ -1,7 +1,7 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, track } from 'lwc';
 import { loadScript } from 'lightning/platformResourceLoader';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
-import tableauJSAPI from '@salesforce/resourceUrl/tableauJSAPI2';
+import tableauJSAPI from '@salesforce/resourceUrl/tableauJSAPI';
 
 import templateMain from './tableauViz2.html';
 
@@ -10,25 +10,51 @@ export default class TableauViz2 extends LightningElement {
     viz;
     isLibLoaded = false;
     workbook; 
-    activeSheet;    
+    activeSheet;
+    activeFilterSheet;    
     activeTable;
-    tableData;
-
+    @track tableData = '';
+    @track dataTableName = ''
+    @track filterData = ''
     // function calls - start
+    clearData() {
+        this.tableData = ''
+    }
     getUnderlyingData() {
+        console.log('getUnderlyingData : ', ' - start ')
         this.activeSheet = this.viz.getWorkbook().getActiveSheet()
         var options = {
-            maxRows: 10, // Max rows to return. Use 0 to return all rows
+            maxRows: 0, // Max rows to return. Use 0 to return all rows
             ignoreAliases: false,
-            ignoreSelection: true,
-            includeAllColumns: false
+            ignoreSelection: false,
+            includeAllColumns: true
         };
-
+        console.log('getUnderlyingData : ', ' - option set ')
+        console.log('getUnderlyingData : ', ' -  async operation started ')
         this.activeSheet.getUnderlyingDataAsync(options)
-            .then(function(t) {
+            .then((t) => {
                 this.activeTable = t
-                this.tableData = JSON.stringify(table.getData())
+                this.tableData = this.tableData + JSON.stringify(this.activeTable.getData())
+                this.dataTableName = this.activeTable.getName()
+                console.log('getUnderlyingData : results ', this.tableData)                
+            })
+        console.log('getUnderlyingData : ', ' - end ')             
+    }
+
+    getFilterInfo() {
+        //get the filter info as well
+        console.log('getFilterInfo : ', ' - start ')
+        this.activeFilterSheet = this.viz.getWorkbook().getActiveSheet()
+        console.log('getFilterInfo : ', ' - after workbook before filter ')
+        this.activeFilterSheet.getFiltersAsync()
+            .then((f) => {
+                console.log('filter data ', JSON.stringify(f))
+                this.filterData = JSON.stringify(f)
             }) 
+            .catch((e) => {
+                this.filterData = ' Error ' + e
+            })
+        console.log('getFilterInfo : ', ' - end ')
     }
 
     renderViz() {
@@ -45,17 +71,21 @@ export default class TableauViz2 extends LightningElement {
         //var url = "https://public.tableau.com/profile/ellenn#!/vizhome/WorldIndicators/GDPpercapita"
         var options = {
           width: containerDiv.offsetWidth,
-          height: 500,
+          height: 400,
           hideTabs: false,
           hideToolbar: false,
+          includeAllColumns: true,
           onFirstInteractive: function () {
             this.workbook = this.viz.getWorkbook();
             this.activeSheet = this.workbook.getActiveSheet();
           }
         };
         this.viz = new tableau.Viz(containerDiv, url, options);    
+        // this is on marks selection
         this.viz.addEventListener(tableau.TableauEventName.MARKS_SELECTION, (marksEvent) => {
             this.onMarksSelection(marksEvent)
+            console.log('on Marks Selection  Completed')
+            console.log('getting underlying data')
             //get the underlying sheet data
             dataOptions = {
                 maxRows: 10, // Max rows to return. Use 0 to return all rows
@@ -65,10 +95,27 @@ export default class TableauViz2 extends LightningElement {
             };            
             this.activeSheet.getUnderlyingDataAsync(dataOptions)
                 .then(function(t) {
+                    console.log('inside getting underlying data')
                     var table = t
                     this.tableData = jSON.stringify(table.getData())
                 })
-        })            
+        })  
+        // this is on filter change
+        this.viz.addEventListener(tableau.TableauEventName.FILTER_CHANGE, (filterEvent) => {
+            console.log('addEventListener FILTER_CHANGE', filterEvent)
+            this.onFilterChange(filterEvent)
+        })          
+    }
+    onFilterChange(filterEvent) {
+        console.log('onFilterselection ', filterEvent)
+        return filterEvent.getFilterAsync()
+            .then((Filter) => {
+                console.log(' filter  ', Filter)
+                this.getFilters(Filter)
+            })
+    }
+    getFilters(Filter) {
+        console.log('filter - ', Filter)
     }
 
     onMarksSelection(marksEvent) {
@@ -93,18 +140,33 @@ export default class TableauViz2 extends LightningElement {
         }
         html.push("\n")
         html.push("\n")
-        html.push('Do you want create a new record from the JSON attributes.')
-        alert(html)
+        this.tableData = html
+        //html.push('Do you want create a new record from the JSON attributes.')
+        //alert(html)
     }
     // function call -end
     async connectedCallback() {
+        console.log('connected callback - start')
         await loadScript(this, tableauJSAPI);
+        console.log('script loaded')
         this.isLibLoaded = true;
+        console.log('rendering viz - start')        
         this.renderViz();
+        console.log('rendering viz - end')
+        console.log('connected callback - end')
     }
 
     renderedCallback() {
-        this.renderViz();
+        Promise.all([loadScript(this, tableauJSAPI)])
+        .then(() => {
+          this.error = undefined;
+          // Call back function if scripts loaded successfully
+          console.log('tableau JS API resource load correctly')
+          this.renderViz();
+        })
+        .catch(error => { 
+        });        
+        //this.renderViz();
     }
 
     render() {

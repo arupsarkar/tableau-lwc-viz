@@ -3,13 +3,34 @@
         <div class="tabVizPlaceholder2" lwc:dom="manual">
         </div>
         <lightning-button variant="brand" 
-            label="Get Data (Not Working)" 
+            label="Get Selected Data" 
             title="Primary action" 
             onclick={getUnderlyingData} 
             class="slds-m-left_x-small">
-        </lightning-button> 
+        </lightning-button>         
     </article>
     <div>
-        {tableData}
+
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col">
+                <lightning-card  title="Selected Data">
+                    <lightning-button variant="brand" label="Create Record" slot="actions"></lightning-button>
+                    <lightning-button label="Clear Data" slot="actions" onclick={clearData}></lightning-button>
+                    <p class="slds-p-horizontal_small">{tableData}</p>
+                    <p slot="footer">{dataTableName}</p>
+                </lightning-card> 
+            </div>
+            <!-- <div class="slds-col">
+                <lightning-card  title="Filters Used">
+                    <lightning-button label="Create Record" slot="actions"></lightning-button>
+                    <p class="slds-p-horizontal_small">{filterData}</p>
+                    <p slot="footer">Filter Data</p>
+                </lightning-card>  
+            </div> -->
+          </div>
+        
+
+        
+       
     </div>
 </template>
