@@ -116,26 +116,26 @@ export default class TableauViz2 extends LightningElement {
         this.viz.addEventListener(tableau.TableauEventName.MARKS_SELECTION, (marksEvent) => {
             this.onMarksSelection(marksEvent)
             console.log('on Marks Selection  Completed')
-            console.log('getting underlying data')
-            //get the underlying sheet data
-            dataOptions = {
-                maxRows: 10, // Max rows to return. Use 0 to return all rows
-                ignoreAliases: false,
-                ignoreSelection: true,
-                includeAllColumns: false
-            };            
-            this.activeSheet.getUnderlyingDataAsync(dataOptions)
-                .then(function(t) {
-                    console.log('inside getting underlying data')
-                    var table = t
-                    this.tableData = jSON.stringify(table.getData())
-                })
+            // console.log('getting underlying data')
+            // //get the underlying sheet data
+            // dataOptions = {
+            //     maxRows: 10, // Max rows to return. Use 0 to return all rows
+            //     ignoreAliases: false,
+            //     ignoreSelection: true,
+            //     includeAllColumns: false
+            // };            
+            // this.activeSheet.getUnderlyingDataAsync(dataOptions)
+            //     .then(function(t) {
+            //         console.log('inside getting underlying data')
+            //         var table = t
+            //         this.tableData = jSON.stringify(table.getData())
+            //     })
         })  
-        // this is on filter change
-        this.viz.addEventListener(tableau.TableauEventName.FILTER_CHANGE, (filterEvent) => {
-            console.log('addEventListener FILTER_CHANGE', filterEvent)
-            this.onFilterChange(filterEvent)
-        })          
+        // // this is on filter change
+        // this.viz.addEventListener(tableau.TableauEventName.FILTER_CHANGE, (filterEvent) => {
+        //     console.log('addEventListener FILTER_CHANGE', filterEvent)
+        //     this.onFilterChange(filterEvent)
+        // })          
     }
     onFilterChange(filterEvent) {
         console.log('onFilterselection ', filterEvent)
